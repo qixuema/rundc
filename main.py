@@ -153,4 +153,4 @@ vertices, triangles = cutils.dual_contouring_undc(
 
 # TODO 
 print("mesh reorientation")
-utils.mesh_reorient(dataset_test, vertices, triangles)
+mesh = utils.mesh_reorient(dataset_test, vertices, triangles)
