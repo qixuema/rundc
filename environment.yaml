@@ -1,0 +1,12 @@
+name: rundc
+channels:
+  - pytorch
+  - defaults
+  - conda-forge
+dependencies:
+  - cython
+  - numpy
+  - pip:
+    - open3d
+
+
