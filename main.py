@@ -48,7 +48,7 @@ else:
 CNN_3d = modelpc.local_pointnet_larger
 
 #Create network
-receptive_padding = 3 #for grid input
+# receptive_padding = 3 #for grid input
 pooling_radius = 2 #for pointcloud input
 KNN_num = modelpc.KNN_num
 
