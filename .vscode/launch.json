@@ -1,0 +1,35 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "--checkpoint_dir",
+                "weights",
+                "--test_input",
+                "examples/mai-city-01.ply",                
+                "--input_type",
+                "noisypc",
+                "--method",
+                "undc",
+                "--postprocessing",
+                "--point_num",
+                "524288",
+                "--grid_size",
+                "64",
+                "--block_num_per_dim",
+                "10",
+                "--gpu",
+                "0"
+            ],
+            "justMyCode": true
+        }
+    ]
+}

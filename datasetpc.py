@@ -1,7 +1,8 @@
+import os
 import numpy as np
 import torch
 import open3d as o3d
-
+import math
 from sklearn.neighbors import KDTree
 
 #only for testing
@@ -14,6 +15,8 @@ class scene_crop_pointcloud(torch.utils.data.Dataset):
         self.pooling_radius = pooling_radius
         self.block_num_per_dim = block_num_per_dim
         self.block_padding = block_padding
+        self.by_voxel_size = True
+        self.voxel_size = 0.1 # NOTE 这里我们添加一个新的变量，从而我们可以根据 voxel_size 大小来确定 block 的数量
 
         if self.data_dir.split(".")[-1]=="ply":
             point_cloud_data = o3d.io.read_point_cloud(self.data_dir)
@@ -22,12 +25,18 @@ class scene_crop_pointcloud(torch.utils.data.Dataset):
             print("ERROR: invalid input type - only support ply or hdf5")
             exit(-1)
 
+        
         #normalize to unit cube for each crop
         LOD_input_min = np.min(LOD_input,0)
         LOD_input_max = np.max(LOD_input,0)
         LOD_input_scale = np.max(LOD_input_max-LOD_input_min) 
         LOD_input = LOD_input-np.reshape(LOD_input_min, [1,3])
-        LOD_input = LOD_input/(LOD_input_scale/self.block_num_per_dim)
+        
+        if self.by_voxel_size:
+            LOD_input = LOD_input/(self.output_grid_size * self.voxel_size)
+        else:
+            LOD_input = LOD_input/(LOD_input_scale/self.block_num_per_dim)
+            
         self.full_scene = LOD_input
         self.full_scene_size = np.ceil(np.max(self.full_scene,0)).astype(np.int32)
         print("Crops:", self.full_scene_size)
@@ -37,6 +46,10 @@ class scene_crop_pointcloud(torch.utils.data.Dataset):
         self.input_point = point_cloud_data
         self.pc_scale = LOD_input_scale
         self.pc_min = LOD_input_min
+        
+        # 用于重命名输出文件
+        _, self.file_name = os.path.split(self.data_dir)
+        self.file_name = self.file_name[0:-4]
 
 
     def __len__(self):

@@ -1,6 +1,6 @@
 python main.py \
     --checkpoint_dir weights \
-    --test_input examples/input_pointcloud.ply \
+    --test_input examples/mai-city-01.ply \
     --input_type noisypc \
     --method undc \
     --postprocessing \
