@@ -27,7 +27,9 @@ def get_normal(q, input_normals, pcd_tree, vertices_normal_part, list_of_vertice
         # q.put([1, pid, idx])
     q.put([1, pid, vertices_normal_part])
 
+
 def mesh_reorient(dataset_pc, vertices, triangles): 
+    
     # 恢复 vertices 的原始尺寸
     if dataset_pc.by_voxel_size:
         vertices = vertices * dataset_pc.voxel_size + dataset_pc.pc_min
@@ -87,36 +89,34 @@ def mesh_reorient(dataset_pc, vertices, triangles):
 
         vertices_normal = vertices_normal_q.sum(axis=0)
         
-        print("finished")
+        print("finished knn")
         
         
         # 修改 triangles 的顶点顺序
-        for ii in range(len(triangles)):
-            # reverse the order of triangle
-            A_idx = triangles[ii,0]
-            B_idx = triangles[ii,1]
-            C_idx = triangles[ii,2]
-
-            A_n = vertices_normal[A_idx]
-            B_n = vertices_normal[B_idx]
-            C_n = vertices_normal[C_idx]
-            # 计算 A、B、C三个点的法向量均值
-            mean_n = (A_n + B_n + C_n)/3
-            
-            A = vertices[A_idx]
-            B = vertices[B_idx]
-            C = vertices[C_idx]
-            ab = B - A
-            bc = C - B
-
-            face_n = np.cross(ab, bc)
-            res = (face_n* mean_n).sum()
-            
-            if res < 0:
-                tmp = triangles[ii,1]
-                triangles[ii,1] = triangles[ii,2]
-                triangles[ii,2] = tmp
+        # 获得面片三个顶点的平均法向
+        triangles_num = len(triangles)
+        triangles_np = np.array(triangles)
+        triangles_np = triangles_np.flatten()
+        triangles_normal = vertices_normal[triangles_np]
+        triangles_normal = triangles_normal.reshape(triangles_num, 3, 3)
+        mean_n = triangles_normal.mean(axis=1)
         
+        # 获得面片的法向
+        vertices_triangles = vertices[triangles_np]
+        vertices_triangles = vertices_triangles.reshape(triangles_num, 3, 3)
+        ab = vertices_triangles[:,1] - vertices_triangles[:,0]
+        bc = vertices_triangles[:,2] - vertices_triangles[:,1]
+        face_n = np.cross(ab, bc)
+        
+        # 根据点乘结果对面片的方向进行调整
+        res = (face_n * mean_n).sum(axis=1)
+        idx = np.argwhere(res < 0)
+        tmp = triangles[idx,1]
+        triangles[idx,1] = triangles[idx,2]
+        triangles[idx,2] = tmp
+        
+        print("finished reoriention")
+             
     mesh = o3d.geometry.TriangleMesh()
     mesh.vertices = o3d.utility.Vector3dVector(vertices)
     mesh.triangles = o3d.utility.Vector3iVector(triangles)
