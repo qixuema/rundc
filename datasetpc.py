@@ -15,7 +15,7 @@ class scene_crop_pointcloud(torch.utils.data.Dataset):
         self.pooling_radius = pooling_radius
         self.block_num_per_dim = block_num_per_dim
         self.block_padding = block_padding
-        self.by_voxel_size = True
+        self.by_voxel_size = False
         self.voxel_size = 0.1 # NOTE 这里我们添加一个新的变量，从而我们可以根据 voxel_size 大小来确定 block 的数量
 
         if self.data_dir.split(".")[-1]=="ply":
