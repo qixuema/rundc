@@ -151,5 +151,5 @@ vertices, triangles = cutils.dual_contouring_undc(
     np.ascontiguousarray(pred_output_bool_numpy, np.int32), 
     np.ascontiguousarray(pred_output_float_numpy, np.float32))
 
-print("mesh reorientation")
-mesh = utils.mesh_reorient(dataset_test, vertices, triangles)
+# mesh = utils.mesh_reorient(dataset_test, vertices, triangles)
+utils.mesh_reorient(dataset_test, vertices, triangles)
