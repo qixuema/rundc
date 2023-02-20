@@ -35,7 +35,11 @@ def mesh_reorient(dataset_pc, vertices, triangles):
         vertices = vertices * dataset_pc.voxel_size + dataset_pc.pc_min
     else:
         vertices = vertices  / (dataset_pc.output_grid_size * dataset_pc.block_num_per_dim) * dataset_pc.pc_scale + dataset_pc.pc_min
-        
+    
+    maicity = False
+    if maicity:
+        vertices[:, 2] = -vertices[:, 2]
+    
     reorient_flag = True # NOTE 因为这个面片重定向很耗时间，我也没优化，为了其他测试，我暂时先把它关掉了
     if reorient_flag:
         # 然后，我们构建一个 KNN 树. 这里注意，必须要用 o3d 提供的点云数据类型作为输入来进行 kd 树构建，不能用 numpy 数据类型来构建，否则下面在 knn 搜寻的时候会报错
