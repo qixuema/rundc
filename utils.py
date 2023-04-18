@@ -2,8 +2,8 @@ import numpy as np
 from statistics import mean
 import open3d as o3d
 from multiprocessing import Process, Queue
-import queue
-
+# import queue
+# 这里我们使用 mp、queue 的时候要注意，调用并行程序的代码不能直接放在最外面，至少要放在 main 函数下面。惨痛的教训
 def get_normal(q, input_normals, pcd_tree, vertices_normal_part, list_of_vertices):
     # global vertices_normal
     vertices_num = len(list_of_vertices)
@@ -40,7 +40,7 @@ def mesh_reorient(dataset_pc, vertices, triangles):
     if maicity:
         vertices[:, 2] = -vertices[:, 2]
     
-    reorient_flag = True # NOTE 因为这个面片重定向很耗时间，我也没优化，为了其他测试，我暂时先把它关掉了
+    reorient_flag = False # NOTE 因为这个面片重定向很耗时间，我也没优化，为了其他测试，我暂时先把它关掉了
     if reorient_flag:
         # 然后，我们构建一个 KNN 树. 这里注意，必须要用 o3d 提供的点云数据类型作为输入来进行 kd 树构建，不能用 numpy 数据类型来构建，否则下面在 knn 搜寻的时候会报错
         point_cloud_data = dataset_pc.input_point
@@ -126,9 +126,9 @@ def mesh_reorient(dataset_pc, vertices, triangles):
     mesh.triangles = o3d.utility.Vector3iVector(triangles)
     
     if reorient_flag:
-        output_mesh_path = "./samples/" + dataset_pc.file_name +"_reorient_mesh.ply"
+        output_mesh_path = "./samples/ygq/" + dataset_pc.file_name +"_reorient_mesh.ply"
     else:
-        output_mesh_path = "./samples/" + dataset_pc.file_name +"_undc_mesh.ply"
+        output_mesh_path = "./samples/L7/" + dataset_pc.file_name +"_undc_mesh.ply"
         
     o3d.io.write_triangle_mesh(output_mesh_path, mesh, write_ascii=True)
     return mesh

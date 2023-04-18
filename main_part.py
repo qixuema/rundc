@@ -29,7 +29,7 @@ os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"]=FLAGS.gpu
 
 import torch
-import datasetpc
+import datasetpc_part
 import modelpc
 import utils
 
@@ -73,7 +73,7 @@ network_bool.eval()
 network_float.eval()
 
 #Create test dataset
-dataset_test = datasetpc.scene_crop_pointcloud(FLAGS.test_input, FLAGS.point_num, FLAGS.grid_size, KNN_num, pooling_radius, FLAGS.block_num_per_dim, FLAGS.block_padding)
+dataset_test = datasetpc_part.scene_crop_pointcloud(FLAGS.test_input, FLAGS.point_num, FLAGS.grid_size, KNN_num, pooling_radius, FLAGS.block_num_per_dim, FLAGS.block_padding)
 dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=8)  #batch_size must be 1
 
 #create large grid，因为是大场景，往往有上百个 block
@@ -146,13 +146,13 @@ for i, data in enumerate(dataloader_test, 0):
                                         FLAGS.block_padding : FLAGS.block_padding + FLAGS.grid_size,
                                         FLAGS.block_padding : FLAGS.block_padding + FLAGS.grid_size].detach().cpu().numpy()
                         
-pred_output_float_numpy = np.clip(pred_output_float_numpy,0,1)
+# pred_output_float_numpy = np.clip(pred_output_float_numpy,0,1)
 
 
-import cutils
-vertices, triangles = cutils.dual_contouring_undc(
-    np.ascontiguousarray(pred_output_bool_numpy, np.int32), 
-    np.ascontiguousarray(pred_output_float_numpy, np.float32))
+# import cutils
+# vertices, triangles = cutils.dual_contouring_undc(
+#     np.ascontiguousarray(pred_output_bool_numpy, np.int32), 
+#     np.ascontiguousarray(pred_output_float_numpy, np.float32))
 
-# mesh = utils.mesh_reorient(dataset_test, vertices, triangles)
-utils.mesh_reorient(dataset_test, vertices, triangles)
+# # mesh = utils.mesh_reorient(dataset_test, vertices, triangles)
+# utils.mesh_reorient(dataset_test, vertices, triangles)
